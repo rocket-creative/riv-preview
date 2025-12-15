@@ -1874,6 +1874,7 @@
 
         /* API Note */
         .api-note {
+            display: none;
             background: rgba(184, 134, 11, 0.1);
             border: 1px dashed var(--color-gold);
             border-radius: var(--radius-sm);
@@ -3337,9 +3338,22 @@
                 gsap.registerPlugin(ScrollTrigger);
                 
                 gsap.utils.toArray('.reveal').forEach(element => {
-                    gsap.from(element, {
-                        opacity: 0,
-                        y: 30,
+                    // Set initial state - ensure content is visible if already in viewport
+                    const rect = element.getBoundingClientRect();
+                    const isInViewport = rect.top < window.innerHeight * 0.85;
+                    
+                    if (isInViewport) {
+                        // Content already in viewport - make it visible immediately
+                        gsap.set(element, { opacity: 1, y: 0 });
+                    } else {
+                        // Content not in viewport - set initial hidden state for animation
+                        gsap.set(element, { opacity: 0, y: 30 });
+                    }
+                    
+                    // Animate when scrolled into view
+                    gsap.to(element, {
+                        opacity: 1,
+                        y: 0,
                         duration: 0.8,
                         ease: 'power2.out',
                         scrollTrigger: {
